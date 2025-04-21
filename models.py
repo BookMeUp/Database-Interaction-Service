@@ -18,6 +18,8 @@ class Service(db.Model):
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    service_id = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.String(20), nullable=False)
-    time = db.Column(db.String(10), nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
+    date = db.Column(db.String, nullable=False)
+    time = db.Column(db.String, nullable=False)
+
+    service = db.relationship("Service", backref="appointments")

@@ -161,7 +161,10 @@ def get_all_appointments():
         {
             "id": a.id,
             "user_id": a.user_id,
-            "service_id": a.service_id,
+            "service": {
+                "id": a.service.id,
+                "name": a.service.name
+            },
             "date": a.date,
             "time": a.time
         }
@@ -174,7 +177,10 @@ def get_appointments_by_user(user_id):
     return jsonify([
         {
             "id": a.id,
-            "service_id": a.service_id,
+            "service": {
+                "id": a.service.id,
+                "name": a.service.name
+            },
             "date": a.date,
             "time": a.time
         }
