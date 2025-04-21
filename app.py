@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from models import db, User, Service, Appointment
+from sqlalchemy.exc import OperationalError
+import time
 
 app = Flask(__name__)
 
@@ -10,8 +12,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize SQLAlchemy
 db.init_app(app)
 
+# Retry logic for waiting on the DB (Swarm-safe)
+MAX_RETRIES = 10
+RETRY_DELAY = 3  # seconds
+
 with app.app_context():
-    db.create_all()
+    for attempt in range(MAX_RETRIES):
+        try:
+            db.create_all()
+            print("✅ Successfully connected to and initialized the database.")
+            break
+        except OperationalError as e:
+            print(f"⏳ Waiting for DB... attempt {attempt + 1}/{MAX_RETRIES}: {e}")
+            time.sleep(RETRY_DELAY)
+    else:
+        print("❌ Could not connect to the database after several retries.")
+        exit(1)
 
 @app.route("/db/health", methods=["GET"])
 def health_check():
