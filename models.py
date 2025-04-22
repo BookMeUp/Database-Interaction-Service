@@ -19,7 +19,13 @@ class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
-    date = db.Column(db.String, nullable=False)
-    time = db.Column(db.String, nullable=False)
+    date = db.Column(db.String, nullable=False)  # e.g., "2025-04-25"
+    time = db.Column(db.String, nullable=False)  # e.g., "09:00"
 
     service = db.relationship("Service", backref="appointments")
+
+class Availability(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String, nullable=False)  # e.g., "2025-04-25"
+    start_time = db.Column(db.String, nullable=False)  # e.g., "09:00"
+    end_time = db.Column(db.String, nullable=False)    # e.g., "17:00"

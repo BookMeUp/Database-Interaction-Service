@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from models import db, User, Service, Appointment
+from models import db, User, Service, Appointment, Availability
 from sqlalchemy.exc import OperationalError
 import time
 
@@ -100,6 +100,19 @@ def get_services():
         for s in services
     ])
 
+@app.route("/services/<int:service_id>", methods=["GET"])
+def get_service_by_id(service_id):
+    service = Service.query.get(service_id)
+    if not service:
+        return jsonify({"error": "[db-service: get_service_by_id()] Service not found"}), 404
+
+    return jsonify({
+        "id": service.id,
+        "name": service.name,
+        "price": service.price,
+        "duration": service.duration
+    }), 200
+
 @app.route("/services", methods=["POST"])
 def create_service():
     data = request.json
@@ -187,6 +200,23 @@ def get_appointments_by_user(user_id):
         for a in appointments
     ])
 
+@app.route("/appointments/date/<date>", methods=["GET"])
+def get_appointments_by_date(date):
+    appointments = Appointment.query.filter_by(date=date).all()
+    return jsonify([
+        {
+            "id": a.id,
+            "user_id": a.user_id,
+            "service": {
+                "id": a.service.id,
+                "name": a.service.name
+            },
+            "date": a.date,
+            "time": a.time
+        }
+        for a in appointments
+    ])
+
 @app.route("/appointments/<int:appointment_id>", methods=["PUT"])
 def update_appointment(appointment_id):
     appointment = Appointment.query.get(appointment_id)
@@ -210,6 +240,56 @@ def delete_appointment(appointment_id):
         db.session.commit()
         return jsonify({"message": "Appointment canceled"})
     return jsonify({"error": "Appointment not found"}), 404
+
+# ---------------- AVAILABILITY ---------------- #
+
+@app.route("/availability", methods=["POST"])
+def add_availability():
+    data = request.json
+    new_slot = Availability(
+        date=data["date"],
+        start_time=data["start_time"],
+        end_time=data["end_time"]
+    )
+    db.session.add(new_slot)
+    db.session.commit()
+    return jsonify({"message": "Availability added"}), 201
+
+@app.route("/availability/id/<int:availability_id>", methods=["GET"])
+def get_availability_by_id(availability_id):
+    availability = Availability.query.get(availability_id)
+    if not availability:
+        return jsonify({"error": "Availability not found"}), 404
+
+    return jsonify({
+        "id": availability.id,
+        "date": availability.date,
+        "start_time": availability.start_time,
+        "end_time": availability.end_time
+    }), 200
+
+@app.route("/availability/<date>", methods=["GET"])
+def get_availability_by_date(date):
+    slots = Availability.query.filter_by(date=date).all()
+    return jsonify([
+        {
+            "id": s.id,
+            "date": s.date,
+            "start_time": s.start_time,
+            "end_time": s.end_time
+        }
+        for s in slots
+    ])
+
+@app.route("/availability/<int:availability_id>", methods=["DELETE"])
+def delete_availability(availability_id):
+    availability = Availability.query.get(availability_id)
+    if not availability:
+        return jsonify({"error": "Availability not found"}), 404
+
+    db.session.delete(availability)
+    db.session.commit()
+    return jsonify({"message": "Availability deleted"}), 200
 
 # ---------------- MAIN ---------------- #
 
