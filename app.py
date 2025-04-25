@@ -2,9 +2,12 @@ from flask import Flask
 from models import db
 from routes import register_blueprints
 from sqlalchemy.exc import OperationalError
+from prometheus_flask_exporter import PrometheusMetrics
 import time
 
 app = Flask(__name__)
+
+metrics = PrometheusMetrics(app)
 
 # DB config (matches docker-compose setup)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@postgres:5432/bookmeup'
@@ -34,4 +37,4 @@ with app.app_context():
 register_blueprints(app)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5003, debug=True)
+    app.run(host='0.0.0.0', port=5003, debug=False)
