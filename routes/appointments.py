@@ -20,6 +20,20 @@ def get_all_appointments():
         for a in appointments
     ])
 
+@appointments_bp.route("/appointments/<int:appointment_id>", methods=["GET"])
+def get_appointment_by_id(appointment_id):
+    appointment = Appointment.query.get(appointment_id)
+    if not appointment:
+        return jsonify({"error": "Appointment not found"}), 404
+
+    return jsonify({
+        "id": appointment.id,
+        "user_id": appointment.user_id,
+        "service_id": appointment.service_id,
+        "date": appointment.date,
+        "time": appointment.time
+    }), 200
+
 @appointments_bp.route("/appointments/user/<int:user_id>", methods=["GET"])
 def get_appointments_by_user(user_id):
     appointments = Appointment.query.filter_by(user_id=user_id).all()
@@ -64,7 +78,10 @@ def create_appointment():
     )
     db.session.add(new_appointment)
     db.session.commit()
-    return jsonify({"message": "Appointment booked"}), 201
+    return jsonify({
+        "message": "Appointment booked",
+        "object_id": new_appointment.id
+    }), 201
 
 @appointments_bp.route("/appointments/<int:appointment_id>", methods=["PUT"])
 def update_appointment(appointment_id):

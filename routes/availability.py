@@ -39,7 +39,10 @@ def add_availability():
     )
     db.session.add(new_slot)
     db.session.commit()
-    return jsonify({"message": "Availability added"}), 201
+    return jsonify({
+        "message": "Availability added",
+        "object_id": new_slot.id
+    }), 201
 
 @availability_bp.route("/availability/<int:availability_id>", methods=["DELETE"])
 def delete_availability(availability_id):

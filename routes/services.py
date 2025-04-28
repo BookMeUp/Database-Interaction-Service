@@ -34,7 +34,10 @@ def create_service():
     )
     db.session.add(new_service)
     db.session.commit()
-    return jsonify({"message": "Service added"}), 201
+    return jsonify({
+        "message": "Service added",
+        "object_id": new_service.id
+    }), 201
 
 @services_bp.route("/services/<int:service_id>", methods=["PUT"])
 def update_service(service_id):

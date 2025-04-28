@@ -14,7 +14,10 @@ def create_user():
     )
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "User created"}), 201
+    return jsonify({
+        "message": "User created",
+        "object_id": new_user.id
+    }), 201
 
 @users_bp.route("/users/<int:user_id>", methods=["GET"])
 def get_user_by_id(user_id):
