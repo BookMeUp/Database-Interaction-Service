@@ -15,7 +15,7 @@ POSTGRES_USER = os.getenv('POSTGRES_USER', 'user')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'password')
 POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'postgres')
 POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
-POSTGRES_DB = os.getenv('POSTGRES_DB', 'bookmeup')
+POSTGRES_DB = os.getenv('POSTGRES_DB', 'slotify')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
